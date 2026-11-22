@@ -9,12 +9,14 @@
 /* Begin PBXBuildFile section */
 		A00100000000000000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000011 /* main.swift */; };
 		A00100000000000000000002 /* mozc_ipc.c in Sources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000012 /* mozc_ipc.c */; };
+		A00100000000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00100000000000000000017 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A00100000000000000000011 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A00100000000000000000012 /* mozc_ipc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = mozc_ipc.c; sourceTree = "<group>"; };
 		A00100000000000000000013 /* GooglePunctuationMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GooglePunctuationMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00100000000000000000017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -23,6 +25,7 @@
 			children = (
 				A00100000000000000000011 /* main.swift */,
 				A00100000000000000000012 /* mozc_ipc.c */,
+				A00100000000000000000017 /* Assets.xcassets */,
 				A00100000000000000000013 /* GooglePunctuationMenu.app */,
 			);
 			sourceTree = "<group>";
@@ -35,6 +38,7 @@
 			buildConfigurationList = A00100000000000000000040 /* Build configuration list for PBXNativeTarget "GooglePunctuationMenu" */;
 			buildPhases = (
 				A00100000000000000000031 /* Sources */,
+				A00100000000000000000032 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -78,6 +82,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00100000000000000000032 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00100000000000000000003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A00100000000000000000031 /* Sources */ = {
@@ -123,6 +138,7 @@
 		A00100000000000000000062 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -141,6 +157,7 @@
 		A00100000000000000000063 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
