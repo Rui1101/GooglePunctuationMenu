@@ -69,6 +69,13 @@ static int session_protocol_version(uint32_t *version) {
   return 0;
 }
 
+static void release_ports(mach_port_t client_port, mach_port_t server_port) {
+  if (client_port != MACH_PORT_NULL)
+    mach_port_mod_refs(mach_task_self(), client_port, MACH_PORT_RIGHT_RECEIVE, -1);
+  if (server_port != MACH_PORT_NULL)
+    mach_port_deallocate(mach_task_self(), server_port);
+}
+
 // Returns 0 on success. The caller owns *response and frees it with mozc_ipc_free.
 int mozc_ipc_call(const uint8_t *request, size_t request_length, uint8_t **response, size_t *response_length) {
   if (!request || !response || !response_length || request_length == 0) return -1;
@@ -83,10 +90,10 @@ int mozc_ipc_call(const uint8_t *request, size_t request_length, uint8_t **respo
   if (kr != KERN_SUCCESS) return -3;
 
   mach_port_t client_port = MACH_PORT_NULL;
-  if (mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &client_port) != KERN_SUCCESS) return -4;
+  if (mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &client_port) != KERN_SUCCESS) { release_ports(MACH_PORT_NULL, server_port); return -4; }
 
   uint8_t *request_copy = malloc(request_length);
-  if (!request_copy) { mach_port_destroy(mach_task_self(), client_port); return -5; }
+  if (!request_copy) { release_ports(client_port, server_port); return -5; }
   memcpy(request_copy, request, request_length);
 
   mozc_mach_message send_message;
@@ -106,23 +113,23 @@ int mozc_ipc_call(const uint8_t *request, size_t request_length, uint8_t **respo
 
   kr = mach_msg(&send_message.header, MACH_SEND_MSG | MACH_SEND_TIMEOUT, send_message.header.msgh_size, 0, MACH_PORT_NULL, 1000, MACH_PORT_NULL);
   free(request_copy);
-  if (kr != MACH_MSG_SUCCESS) { mach_port_destroy(mach_task_self(), client_port); return -6; }
+  if (kr != MACH_MSG_SUCCESS) { release_ports(client_port, server_port); return -6; }
 
   mozc_mach_receive_message receive_message;
   memset(&receive_message, 0, sizeof(receive_message));
   receive_message.header.msgh_size = sizeof(receive_message);
   kr = mach_msg(&receive_message.header, MACH_RCV_MSG | MACH_RCV_TIMEOUT, 0, receive_message.header.msgh_size, client_port, 1000, MACH_PORT_NULL);
-  if (kr != MACH_MSG_SUCCESS) { mach_port_destroy(mach_task_self(), client_port); return -7; }
+  if (kr != MACH_MSG_SUCCESS) { release_ports(client_port, server_port); return -7; }
   if (receive_message.header.msgh_id != protocol_version || receive_message.data.size == 0 || !receive_message.data.address) {
-    mach_port_destroy(mach_task_self(), client_port); return -8;
+    release_ports(client_port, server_port); return -8;
   }
   uint8_t *copy = malloc(receive_message.data.size);
-  if (!copy) { vm_deallocate(mach_task_self(), (vm_address_t)receive_message.data.address, receive_message.data.size); mach_port_destroy(mach_task_self(), client_port); return -9; }
+  if (!copy) { vm_deallocate(mach_task_self(), (vm_address_t)receive_message.data.address, receive_message.data.size); release_ports(client_port, server_port); return -9; }
   memcpy(copy, receive_message.data.address, receive_message.data.size);
   *response = copy;
   *response_length = receive_message.data.size;
   vm_deallocate(mach_task_self(), (vm_address_t)receive_message.data.address, receive_message.data.size);
-  mach_port_destroy(mach_task_self(), client_port);
+  release_ports(client_port, server_port);
   return 0;
 }
 
